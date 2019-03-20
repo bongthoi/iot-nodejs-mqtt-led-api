@@ -1,5 +1,7 @@
 import express from 'express';
 import MqttService from '../services/MqttService';
+import httpStatus from '../../configs/httpStatus.json';
+import data from '../../configs/data.json'
 
 /** */
 let router = express.Router();
@@ -15,14 +17,27 @@ router.get("/", (req, res) => {
  * Mqtt API
  */
 
-router.get("/api/stc/floor1/showroom/brightness/led/:status", function(req, res) {
-	let topic="stc/floor1/showroom/brightness/led";
-	let message=req.params.status;
+router.get("/api/stc/floor1/showroom/light/:status", function(req, res) {
+	let method=data.topic1;
+	console.log(method+" ===>start");
 
-	mqttService.subscribeTopic(topic);
-	mqttService.publishMessage(topic,message);
-	res.status(200).send(topic+" -->"+ req.params.status);
+	let topic=data.topic1;
+	let message=req.params.status;
+	try {
+		mqttService.subscribeTopic(topic);
+		mqttService.publishMessage(topic,message,0,false);	
+
+		console.log(method+" -->success");
+		res.json({"status":httpStatus.success,"data":{topic:topic,message:message}});	
+	} catch (error) {
+		console.log(method+" -->failed");
+		res.json({"status":httpStatus.failed});			
+	}
+	
+	//res.status(200).send(topic+" -->"+ message);
   });
+
+  
 
 
 /**export */
